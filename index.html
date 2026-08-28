@@ -42,14 +42,54 @@
         <button class="btn btn-secondary btn-icon" title="홈으로" onclick="App.showView('home')">
           🏠
         </button>
+        <button class="btn btn-secondary btn-icon" title="잠금 / 로그아웃" onclick="App.logout()">
+          🔒
+        </button>
       </div>
     </header>
 
 
     <!-- ====================================================================
+         0. VIEW: AUTHENTICATION GATE (접속 비밀번호 입력)
+         ==================================================================== -->
+    <main class="view-section" id="view_auth">
+      <div class="auth-wrapper">
+        <div class="auth-card" id="authCard">
+          <div class="auth-icon">🔐</div>
+          <h1 class="auth-title">2026 청상1급 CBT</h1>
+          <p class="auth-desc">실전 모의고사 접속을 위해 비밀번호를 입력해 주세요.</p>
+
+          <form class="auth-form" onsubmit="App.handleLogin(event)">
+            <div class="auth-input-group">
+              <input type="password" id="inputPasscode" class="auth-input" placeholder="비밀번호 입력" autocomplete="current-password" autofocus />
+              <button type="button" class="auth-eye-btn" id="btnTogglePassword" onclick="App.togglePasswordVisibility()">👁️</button>
+            </div>
+
+            <div class="auth-error-msg" id="authErrorMsg">
+              <span>⚠️</span>
+              <span id="authErrorText">비밀번호가 일치하지 않습니다.</span>
+            </div>
+
+            <div class="auth-remember-row">
+              <label style="display:flex; align-items:center; gap:6px; cursor:pointer;">
+                <input type="checkbox" id="chkRememberAuth" checked style="width:16px; height:16px; cursor:pointer;" />
+                <span>로그인 상태 유지</span>
+              </label>
+            </div>
+
+            <button type="submit" class="btn btn-primary btn-block btn-lg" style="margin-top:8px;">
+              🚀 모의고사 입장하기
+            </button>
+          </form>
+        </div>
+      </div>
+    </main>
+
+
+    <!-- ====================================================================
          2. VIEW: HOME (모드 선택 및 대시보드)
          ==================================================================== -->
-    <main class="view-section active" id="view_home">
+    <main class="view-section" id="view_home">
       <div class="home-hero">
         <div class="home-badge-row">
           <span class="badge badge-primary">2026년 제25회 대비</span>

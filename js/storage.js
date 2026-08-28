@@ -3,12 +3,29 @@
  */
 const StorageManager = {
   KEYS: {
+    AUTH: 'cbt_auth_state',
     THEME: 'cbt_theme',
     FONT_SIZE: 'cbt_font_size',
     ACTIVE_SESSION: 'cbt_active_session',
     HISTORY: 'cbt_history',
     WRONG_NOTES: 'cbt_wrong_notes',
     BOOKMARKS: 'cbt_bookmarks'
+  },
+
+  // Authentication Gate
+  isAuthenticated() {
+    return localStorage.getItem(this.KEYS.AUTH) === 'true' || sessionStorage.getItem(this.KEYS.AUTH) === 'true';
+  },
+  setAuthenticated(remember = true) {
+    if (remember) {
+      localStorage.setItem(this.KEYS.AUTH, 'true');
+    } else {
+      sessionStorage.setItem(this.KEYS.AUTH, 'true');
+    }
+  },
+  clearAuth() {
+    localStorage.removeItem(this.KEYS.AUTH);
+    sessionStorage.removeItem(this.KEYS.AUTH);
   },
 
   // Settings

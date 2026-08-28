@@ -3,20 +3,92 @@
  */
 const App = {
   currentView: 'home',
+  ACCESS_PASSCODE: '123@@@',
 
   init() {
     this.initTheme();
     this.initFontSize();
     this.initKeyboardShortcuts();
-    this.renderHomeStats();
-    this.checkResumeSession();
-    this.showView('home');
+
+    if (!StorageManager.isAuthenticated()) {
+      this.showView('auth');
+    } else {
+      this.renderHomeStats();
+      this.checkResumeSession();
+      this.showView('home');
+    }
+  },
+
+  /**
+   * 로그인 / 인증 처리
+   */
+  handleLogin(e) {
+    if (e) e.preventDefault();
+
+    const input = document.getElementById('inputPasscode');
+    const errorBox = document.getElementById('authErrorMsg');
+    const rememberChk = document.getElementById('chkRememberAuth');
+    const card = document.getElementById('authCard');
+
+    const entered = (input ? input.value : '').trim();
+
+    if (entered === this.ACCESS_PASSCODE) {
+      if (errorBox) errorBox.classList.remove('active');
+      const remember = rememberChk ? rememberChk.checked : true;
+      StorageManager.setAuthenticated(remember);
+
+      this.renderHomeStats();
+      this.checkResumeSession();
+      this.showView('home');
+      this.showToast('✅ 정상적으로 인증되었습니다. 환영합니다!');
+      if (input) input.value = '';
+    } else {
+      if (errorBox) errorBox.classList.add('active');
+      if (card) {
+        card.style.animation = 'none';
+        card.offsetHeight; // Trigger reflow
+        card.style.animation = 'shakeAuth 0.35s ease';
+      }
+      if (input) {
+        input.value = '';
+        input.focus();
+      }
+      this.showToast('⚠️ 비밀번호가 일치하지 않습니다.');
+    }
+  },
+
+  togglePasswordVisibility() {
+    const input = document.getElementById('inputPasscode');
+    const btn = document.getElementById('btnTogglePassword');
+    if (!input || !btn) return;
+
+    if (input.type === 'password') {
+      input.type = 'text';
+      btn.textContent = '🙈';
+    } else {
+      input.type = 'password';
+      btn.textContent = '👁️';
+    }
+  },
+
+  logout() {
+    if (confirm('로그아웃하고 초기 인증 화면으로 돌아가시겠습니까?')) {
+      ExamEngine.clearInterval();
+      StorageManager.clearAuth();
+      this.showView('auth');
+      this.showToast('🔒 로그아웃되었습니다.');
+    }
   },
 
   /**
    * 화면 뷰 전환
    */
   showView(viewName) {
+    // Force auth view if not authenticated
+    if (!StorageManager.isAuthenticated() && viewName !== 'auth') {
+      viewName = 'auth';
+    }
+
     this.currentView = viewName;
 
     // Toggle active section
@@ -35,14 +107,22 @@ const App = {
     const examHeader = document.getElementById('examHeaderBar');
     const bottomNav = document.getElementById('bottomNavBar');
 
-    if (viewName === 'exam') {
-      header.style.display = 'none';
-      examHeader.style.display = 'flex';
-      bottomNav.style.display = 'flex';
+    if (viewName === 'auth') {
+      if (header) header.style.display = 'none';
+      if (examHeader) examHeader.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'none';
+      setTimeout(() => {
+        const input = document.getElementById('inputPasscode');
+        if (input) input.focus();
+      }, 100);
+    } else if (viewName === 'exam') {
+      if (header) header.style.display = 'none';
+      if (examHeader) examHeader.style.display = 'flex';
+      if (bottomNav) bottomNav.style.display = 'flex';
     } else {
-      header.style.display = 'flex';
-      examHeader.style.display = 'none';
-      bottomNav.style.display = 'none';
+      if (header) header.style.display = 'flex';
+      if (examHeader) examHeader.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'none';
     }
 
     // View specific hooks
