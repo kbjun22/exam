@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#3b82f6">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>2026 청소년상담사 1급 실전 모의고사 CBT</title>
+  
+  <!-- Pretendard Font -->
+  <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
+  
+  <!-- Stylesheets -->
+  <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/components.css">
+</head>
+<body class="font-md">
+
+  <div id="app">
+
+    <!-- ====================================================================
+         1. GLOBAL HEADER
+         ==================================================================== -->
+    <header class="app-header" id="appHeader">
+      <div class="header-left">
+        <div class="header-title" onclick="App.showView('home')" style="cursor:pointer;">
+          <span>🎯</span>
+          <span>청상1급 CBT</span>
+        </div>
+      </div>
+      <div class="header-right">
+        <button class="btn btn-secondary btn-icon" id="btnFontSize" title="글자 크기 조절" onclick="App.cycleFontSize()">
+          가
+        </button>
+        <button class="btn btn-secondary btn-icon" id="btnToggleTheme" title="다크/라이트 모드" onclick="App.toggleTheme()">
+          🌙
+        </button>
+        <button class="btn btn-secondary btn-icon" title="응시 이력" onclick="App.showView('history')">
+          📊
+        </button>
+        <button class="btn btn-secondary btn-icon" title="홈으로" onclick="App.showView('home')">
+          🏠
+        </button>
+      </div>
+    </header>
+
+
+    <!-- ====================================================================
+         2. VIEW: HOME (모드 선택 및 대시보드)
+         ==================================================================== -->
+    <main class="view-section active" id="view_home">
+      <div class="home-hero">
+        <div class="home-badge-row">
+          <span class="badge badge-primary">2026년 제25회 대비</span>
+          <span class="badge badge-accent">최신 DSM-5-TR &amp; 법령 반영</span>
+          <span class="badge badge-success">총 175문항 완비</span>
+        </div>
+        <h1 class="home-title">청소년상담사 1급 실전 모의고사</h1>
+        <p class="home-subtitle">모바일 환경에 최적화된 실전 CBT 시험 &amp; 오답노트 시스템</p>
+      </div>
+
+      <!-- Quick Stats Card -->
+      <div class="quick-stats-card">
+        <div class="stat-item" onclick="App.showView('history')" style="cursor:pointer;">
+          <div class="stat-num" id="homeHistoryCount">0회</div>
+          <div class="stat-label">모의고사 응시</div>
+        </div>
+        <div class="stat-item" onclick="App.showView('wrong-notes')" style="cursor:pointer;">
+          <div class="stat-num" id="homeWrongCountBadge" style="color:var(--danger);">0문항</div>
+          <div class="stat-label">오답노트</div>
+        </div>
+        <div class="stat-item" onclick="App.showView('subject-select')" style="cursor:pointer;">
+          <div class="stat-num">7개</div>
+          <div class="stat-label">전 과목 연습</div>
+        </div>
+      </div>
+
+      <!-- Main Exam Modes -->
+      <div class="mode-grid">
+        <!-- 1교시 실전 모의고사 -->
+        <div class="mode-card featured" onclick="ExamEngine.startExam({ mode: 'session1' })">
+          <div class="mode-card-header">
+            <div class="mode-icon-box">1️⃣</div>
+            <span class="badge badge-primary">실전 75분 타이머</span>
+          </div>
+          <div class="mode-card-info">
+            <h3>제1교시 실전 모의고사</h3>
+            <p>상담사 교육 및 사례지도, 청소년 관련 법과 행정, 상담연구방법론의 실제</p>
+          </div>
+          <div class="mode-meta">
+            <span>📝 총 75문항 (과목당 25문항)</span>
+            <span>•</span>
+            <span>⏱️ 75분</span>
+          </div>
+        </div>
+
+        <!-- 2교시 실전 모의고사 -->
+        <div class="mode-card featured" onclick="ExamEngine.startExam({ mode: 'session2' })">
+          <div class="mode-card-header">
+            <div class="mode-icon-box accent">2️⃣</div>
+            <span class="badge badge-accent">실전 100분 타이머</span>
+          </div>
+          <div class="mode-card-info">
+            <h3>제2교시 실전 모의고사</h3>
+            <p>비행상담, 성상담, 약물상담, 위기상담 (전공 4과목 통합)</p>
+          </div>
+          <div class="mode-meta">
+            <span>📝 총 100문항 (과목당 25문항)</span>
+            <span>•</span>
+            <span>⏱️ 100분</span>
+          </div>
+        </div>
+
+        <!-- 전체 풀세트 모의고사 -->
+        <div class="mode-card" onclick="ExamEngine.startExam({ mode: 'all' })">
+          <div class="mode-card-header">
+            <div class="mode-icon-box success">👑</div>
+            <span class="badge badge-success">전체 175문항</span>
+          </div>
+          <div class="mode-card-info">
+            <h3>실전 풀세트 모의고사 (1+2교시)</h3>
+            <p>1교시 75문항 + 2교시 100문항 전체 7개 과목 통합 실전 평가</p>
+          </div>
+          <div class="mode-meta">
+            <span>📝 총 175문항</span>
+            <span>•</span>
+            <span>⏱️ 175분</span>
+          </div>
+        </div>
+
+        <!-- 과목별 집중 연습 모드 -->
+        <div class="mode-card" onclick="App.showView('subject-select')">
+          <div class="mode-card-header">
+            <div class="mode-icon-box warning">📚</div>
+            <span class="badge badge-warning">즉시 해설 가능</span>
+          </div>
+          <div class="mode-card-info">
+            <h3>과목별 집중 연습 모드</h3>
+            <p>원하는 과목(25문항)만 골라서 풀고 즉시 정답 및 오답 반증 확인</p>
+          </div>
+          <div class="mode-meta">
+            <span>🔍 과목 선택 후 학습</span>
+          </div>
+        </div>
+
+        <!-- 오답노트 & 다시 풀기 -->
+        <div class="mode-card" onclick="App.showView('wrong-notes')">
+          <div class="mode-card-header">
+            <div class="mode-icon-box danger">🔄</div>
+            <span class="badge badge-danger">오답 집중 복습</span>
+          </div>
+          <div class="mode-card-info">
+            <h3>오답노트 &amp; 틀린 문제 다시 풀기</h3>
+            <p>지금까지 틀린 문제들을 모아서 완벽히 숙지할 때까지 재응시</p>
+          </div>
+          <div class="mode-meta">
+            <span>🧠 취약점 보완</span>
+          </div>
+        </div>
+      </div>
+    </main>
+
+
+    <!-- ====================================================================
+         3. VIEW: SUBJECT SELECT (과목별 연습 선택)
+         ==================================================================== -->
+    <main class="view-section" id="view_subject-select">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h2>📚 과목별 집중 연습</h2>
+        <button class="btn btn-secondary btn-sm" onclick="App.showView('home')">← 홈으로</button>
+      </div>
+
+      <div class="card" style="margin-bottom:16px; padding:14px 18px; display:flex; align-items:center; justify-content:space-between;">
+        <div>
+          <div style="font-weight:700; font-size:0.95rem;">💡 문제 풀이 즉시 정답/해설 보기</div>
+          <div style="font-size:0.8rem; color:var(--text-muted);">보기를 누르면 정답 여부와 해설이 바로 표시됩니다.</div>
+        </div>
+        <input type="checkbox" id="chkInstantFeedback" checked style="width:20px; height:20px; cursor:pointer;" />
+      </div>
+
+      <div class="subject-list">
+        <div class="subject-item-card" onclick="App.startSubjectExam(1)">
+          <div>
+            <div class="subject-item-title">[1교시 1과목] 상담사 교육 및 사례지도</div>
+            <div class="subject-item-sub">수퍼비전 모형, 상담자 발달, 윤리 및 역량평가 (25문항)</div>
+          </div>
+          <span class="badge badge-primary">시작 ▶</span>
+        </div>
+
+        <div class="subject-item-card" onclick="App.startSubjectExam(2)">
+          <div>
+            <div class="subject-item-title">[1교시 2과목] 청소년 관련 법과 행정</div>
+            <div class="subject-item-sub">청소년 기본법, 복지지원법, 보호법, 활동진흥법 (25문항)</div>
+          </div>
+          <span class="badge badge-primary">시작 ▶</span>
+        </div>
+
+        <div class="subject-item-card" onclick="App.startSubjectExam(3)">
+          <div>
+            <div class="subject-item-title">[1교시 3과목] 상담연구방법론의 실제</div>
+            <div class="subject-item-sub">연구설계, 척도타당화, 회귀·매개·조절, 구조방정식 (25문항)</div>
+          </div>
+          <span class="badge badge-primary">시작 ▶</span>
+        </div>
+
+        <div class="subject-item-card" onclick="App.startSubjectExam(4)">
+          <div>
+            <div class="subject-item-title">[2교시 4과목] 비행상담</div>
+            <div class="subject-item-sub">비행이론, 소년사법절차, 품행장애 및 다체계 개입 (25문항)</div>
+          </div>
+          <span class="badge badge-accent">시작 ▶</span>
+        </div>
+
+        <div class="subject-item-card" onclick="App.startSubjectExam(5)">
+          <div>
+            <div class="subject-item-title">[2교시 5과목] 성상담</div>
+            <div class="subject-item-sub">성발달, 성정체성, 디지털 성범죄 및 성인지적 개입 (25문항)</div>
+          </div>
+          <span class="badge badge-accent">시작 ▶</span>
+        </div>
+
+        <div class="subject-item-card" onclick="App.startSubjectExam(6)">
+          <div>
+            <div class="subject-item-title">[2교시 6과목] 약물상담</div>
+            <div class="subject-item-sub">약물 약리, 물질사용장애, 동기강화 및 재발방지 (25문항)</div>
+          </div>
+          <span class="badge badge-accent">시작 ▶</span>
+        </div>
+
+        <div class="subject-item-card" onclick="App.startSubjectExam(7)">
+          <div>
+            <div class="subject-item-title">[2교시 7과목] 위기상담</div>
+            <div class="subject-item-sub">자살·자해 위기, 재난·외상 트라우마, 긴급구조 프로토콜 (25문항)</div>
+          </div>
+          <span class="badge badge-accent">시작 ▶</span>
+        </div>
+      </div>
+    </main>
+
+
+    <!-- ====================================================================
+         4. VIEW: CBT EXAM ROOM (1화면 1문제)
+         ==================================================================== -->
+    <main class="view-section" id="view_exam">
+      <!-- Fixed Exam Top Info Bar -->
+      <div class="exam-header-bar" id="examHeaderBar">
+        <div class="exam-info-row">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="btn btn-secondary btn-sm" onclick="App.confirmExitExam()" title="시험 중단 후 나가기">
+              ✕ 중단
+            </button>
+            <span class="exam-subject-badge" id="examSubjectBadge">과목명</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:8px;">
+            <button class="btn btn-secondary btn-icon" id="btnExamFontSize" title="글자 크기" onclick="App.cycleFontSize()">
+              가
+            </button>
+            <div class="timer-box" id="examTimer">⏱️ 00:00</div>
+          </div>
+        </div>
+
+        <!-- Progress Bar -->
+        <div style="display:flex; align-items:center; justify-content:space-between; font-size:0.78rem; color:var(--text-muted);">
+          <span id="examModeTitle">실전 모의고사</span>
+          <span id="examProgressText" style="font-weight:700; color:var(--primary);">문항 1 / 75</span>
+        </div>
+        <div class="exam-progress-bar-container">
+          <div class="exam-progress-fill" id="examProgressFill"></div>
+        </div>
+      </div>
+
+      <!-- Center Single Question Card (1화면 1문제) -->
+      <div class="question-container">
+        <div class="question-card" id="mainQuestionCard">
+          
+          <!-- Tags & Bookmark Row -->
+          <div class="question-meta-row">
+            <div class="question-tags" id="questionTags">
+              <span class="badge badge-primary">문항 1</span>
+            </div>
+            <button class="btn-bookmark" id="btnBookmark" title="문항 북마크 (단축키 B)" onclick="ExamEngine.toggleBookmark()">
+              ☆
+            </button>
+          </div>
+
+          <!-- Question Stem / Passage (Markdown) -->
+          <div class="markdown-content" id="questionStem" style="font-size:1.05rem; font-weight:600; line-height:1.65; color:var(--text-main);">
+            문제 본문 내용이 이곳에 표시됩니다.
+          </div>
+
+          <!-- Circular Choice Options (원형 체크박스 / 라디오 1~5) -->
+          <div class="options-list" id="optionsList">
+            <!-- Dynamically populated -->
+          </div>
+
+          <!-- Instant Feedback (Practice Mode) -->
+          <div class="instant-explanation-box" id="instantFeedbackBox">
+            <!-- Dynamically populated in practice mode -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Bottom Fixed Navigation Bar -->
+      <div class="bottom-nav-bar" id="bottomNavBar">
+        <button class="btn btn-secondary" id="btnPrevQuestion" onclick="ExamEngine.prevQuestion()">
+          ◀ 이전
+        </button>
+        <button class="nav-omr-btn" id="btnOpenOMR" onclick="ExamEngine.openOMR()">
+          <span>📋 OMR</span>
+          <span class="badge badge-primary" id="navOmrCounter">0/75</span>
+        </button>
+        <button class="btn btn-secondary" id="btnNextQuestion" onclick="ExamEngine.nextQuestion()">
+          다음 ▶
+        </button>
+      </div>
+
+      <!-- Slide-Up OMR Sheet Drawer -->
+      <div class="omr-drawer-overlay" id="omrDrawerOverlay" onclick="ExamEngine.closeOMR()"></div>
+      <div class="omr-drawer" id="omrDrawer">
+        <div class="omr-drag-handle" onclick="ExamEngine.closeOMR()"></div>
+        <div class="omr-header">
+          <div>
+            <div style="font-weight:700; font-size:1rem;">📋 답안지 (OMR 카드)</div>
+            <div style="font-size:0.78rem; color:var(--text-muted);" id="omrStatusText">0문항 마킹 완료</div>
+          </div>
+          <button class="btn btn-secondary btn-sm" onclick="ExamEngine.closeOMR()">닫기 ✕</button>
+        </div>
+
+        <div class="omr-grid-body" id="omrGridBody">
+          <!-- Dynamically populated -->
+        </div>
+
+        <div class="omr-footer">
+          <button class="btn btn-secondary btn-block" onclick="ExamEngine.closeOMR()">계속 풀기</button>
+          <button class="btn btn-primary btn-block" onclick="ExamEngine.confirmSubmit()">🏁 답안 제출 &amp; 채점</button>
+        </div>
+      </div>
+    </main>
+
+
+    <!-- ====================================================================
+         5. VIEW: SCORE & ANALYTICS (자동 채점 및 성적표)
+         ==================================================================== -->
+    <main class="view-section" id="view_score">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h2>📊 모의고사 채점 결과</h2>
+        <button class="btn btn-secondary btn-sm" onclick="App.showView('home')">🏠 홈으로</button>
+      </div>
+
+      <!-- Pass/Fail Banner -->
+      <div id="scoreBanner" class="score-banner">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <!-- Action Buttons -->
+      <div style="display:flex; gap:10px; margin-bottom:20px; flex-wrap:wrap;">
+        <button class="btn btn-primary btn-block" id="btnRetryWrongFromScore" onclick="ScoreEngine.retryWrongQuestions()">
+          🔄 틀린 문제 다시 풀기
+        </button>
+      </div>
+
+      <!-- Subject Scores Breakdown -->
+      <h3 style="margin-bottom:12px; font-size:1.05rem;">📈 과목별 성적 및 과락 분석</h3>
+      <div class="subject-scores-container" id="scoreSubjectList">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <!-- Full Questions Review -->
+      <div style="display:flex; align-items:center; justify-content:space-between; margin:24px 0 12px;">
+        <h3 style="font-size:1.05rem;">📖 전체 문항 심층 해설 &amp; 오답 반증</h3>
+        <div style="display:flex; gap:6px;">
+          <button class="btn btn-secondary btn-sm" onclick="ScoreEngine.renderReviewList(ScoreEngine.lastResult.gradedQuestions, 'all')">전체</button>
+          <button class="btn btn-secondary btn-sm" onclick="ScoreEngine.renderReviewList(ScoreEngine.lastResult.gradedQuestions, 'wrong')">오답만</button>
+          <button class="btn btn-secondary btn-sm" onclick="ScoreEngine.renderReviewList(ScoreEngine.lastResult.gradedQuestions, 'correct')">정답만</button>
+        </div>
+      </div>
+
+      <div id="scoreReviewContainer">
+        <!-- Dynamically rendered -->
+      </div>
+    </main>
+
+
+    <!-- ====================================================================
+         6. VIEW: WRONG NOTES (오답노트 & 다시 풀기)
+         ==================================================================== -->
+    <main class="view-section" id="view_wrong-notes">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h2>🔄 오답노트 &amp; 다시 풀기</h2>
+        <button class="btn btn-secondary btn-sm" onclick="App.showView('home')">🏠 홈으로</button>
+      </div>
+
+      <!-- Stats Bar & Retry Button -->
+      <div id="wrongNotesStats"></div>
+
+      <!-- Filter Buttons -->
+      <div class="omr-tabs" style="margin-bottom:16px; border:none; padding:0;">
+        <button class="omr-tab-btn wrong-filter-btn active" data-filter="all" onclick="WrongNotesManager.setFilter('all')">전체 오답</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="unmastered" onclick="WrongNotesManager.setFilter('unmastered')">미완료 문항</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="1" onclick="WrongNotesManager.setFilter('1')">1과목 (사례지도)</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="2" onclick="WrongNotesManager.setFilter('2')">2과목 (법행정)</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="3" onclick="WrongNotesManager.setFilter('3')">3과목 (연구방법)</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="4" onclick="WrongNotesManager.setFilter('4')">4과목 (비행)</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="5" onclick="WrongNotesManager.setFilter('5')">5과목 (성)</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="6" onclick="WrongNotesManager.setFilter('6')">6과목 (약물)</button>
+        <button class="omr-tab-btn wrong-filter-btn" data-filter="7" onclick="WrongNotesManager.setFilter('7')">7과목 (위기)</button>
+      </div>
+
+      <!-- Wrong Notes List -->
+      <div id="wrongNotesList">
+        <!-- Dynamically rendered -->
+      </div>
+    </main>
+
+
+    <!-- ====================================================================
+         7. VIEW: HISTORY (응시 이력)
+         ==================================================================== -->
+    <main class="view-section" id="view_history">
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
+        <h2>📊 나의 모의고사 응시 이력</h2>
+        <button class="btn btn-secondary btn-sm" onclick="App.showView('home')">🏠 홈으로</button>
+      </div>
+
+      <div id="historyListContainer">
+        <!-- Dynamically rendered -->
+      </div>
+
+      <div style="margin-top:20px; text-align:center;">
+        <button class="btn btn-secondary btn-sm" onclick="if(confirm('모든 응시 기록을 초기화하시겠습니까?')) { StorageManager.clearHistory(); App.renderHistoryView(); App.renderHomeStats(); }">
+          🗑️ 응시 기록 초기화
+        </button>
+      </div>
+    </main>
+
+  </div><!-- /#app -->
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Scripts -->
+  <script src="data/questions.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/score.js"></script>
+  <script src="js/wrong-notes.js"></script>
+  <script src="js/exam.js"></script>
+  <script src="js/app.js"></script>
+
+  <script>
+    // Extra helper on App object for subject exam initiation and exit confirmation
+    App.startSubjectExam = function(subjectId) {
+      const isInstant = document.getElementById('chkInstantFeedback').checked;
+      ExamEngine.startExam({
+        mode: 'subject',
+        subjectId: subjectId,
+        isInstantFeedback: isInstant
+      });
+    };
+
+    App.confirmExitExam = function() {
+      if (confirm('시험을 중단하고 홈으로 이동하시겠습니까?\n(현재까지 푼 답안은 자동 임시저장됩니다.)')) {
+        ExamEngine.clearInterval();
+        App.showView('home');
+      }
+    };
+  </script>
+</body>
+</html>
