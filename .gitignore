@@ -1,0 +1,7 @@
+# Python cache
+__pycache__/
+*.pyc
+
+# Logs & temp files
+scripts/*.txt
+scripts/*.log

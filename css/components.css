@@ -957,3 +957,72 @@
   40%, 80% { transform: translateX(6px); }
 }
 
+/* --------------------------------------------------------------------------
+   8. MULTI-ROUND SELECTOR (회차 선택 컴포넌트)
+   -------------------------------------------------------------------------- */
+.round-select-container {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+@media (min-width: 540px) {
+  .round-select-container {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+.round-select-card {
+  background: var(--bg-card);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+}
+
+.round-select-card:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.round-select-card.active {
+  border-color: var(--primary);
+  background: linear-gradient(135deg, var(--bg-card), var(--primary-light));
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.18), var(--shadow-sm);
+}
+
+.round-select-card.upcoming {
+  opacity: 0.65;
+  cursor: default;
+  border-style: dashed;
+}
+
+.round-select-card.upcoming:hover {
+  transform: none;
+  border-color: var(--border-color);
+  box-shadow: none;
+}
+
+.cbt-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 0.9rem;
+}
+
+.cbt-table td, .cbt-table th {
+  border: 1px solid var(--border-color);
+  padding: 8px 12px;
+  text-align: left;
+}
+
+.cbt-table tr:nth-child(even) {
+  background: var(--bg-subtle);
+}
+
+

@@ -1,11 +1,14 @@
 /**
- * 2026 청소년상담사 1급 CBT - 메인 컨트롤러 & 라우터 (App Controller)
+ * 2026 청소년상담사 1급 CBT - 메인 컨트롤러 & 라우터 (App Controller & Multi-Round)
  */
 const App = {
   currentView: 'home',
+  currentRound: 2,
   ACCESS_PASSCODE: '123@@@',
 
   init() {
+    this.currentRound = StorageManager.getSelectedRound();
+    this.syncRoundData();
     this.initTheme();
     this.initFontSize();
     this.initKeyboardShortcuts();
@@ -13,10 +16,109 @@ const App = {
     if (!StorageManager.isAuthenticated()) {
       this.showView('auth');
     } else {
+      this.renderRoundSelector();
       this.renderHomeStats();
       this.checkResumeSession();
       this.showView('home');
     }
+  },
+
+  syncRoundData() {
+    if (window.MOCK_EXAMS_DATA && window.MOCK_EXAMS_DATA[this.currentRound]) {
+      window.EXAM_QUESTIONS = window.MOCK_EXAMS_DATA[this.currentRound];
+    }
+  },
+
+  /**
+   * 모의고사 회차 변경 (1회, 2회, ...)
+   */
+  selectRound(roundId) {
+    this.currentRound = parseInt(roundId, 10);
+    StorageManager.setSelectedRound(this.currentRound);
+    this.syncRoundData();
+    this.renderRoundSelector();
+    this.renderHomeStats();
+    this.showToast(`✅ 제${this.currentRound}회 실전 모의고사가 선택되었습니다.`);
+  },
+
+  /**
+   * 홈 화면 회차 선택기 렌더링
+   */
+  renderRoundSelector() {
+    const rounds = window.MOCK_EXAM_ROUNDS || [
+      { id: 1, title: '제1회 실전 모의고사', badge: '제1회' },
+      { id: 2, title: '제2회 실전 모의고사', badge: '제2회 (NEW)' }
+    ];
+
+    // Update Round Selector Buttons in Home View
+    const container = document.getElementById('homeRoundSelector');
+    if (container) {
+      container.innerHTML = '';
+      rounds.forEach(r => {
+        const isActive = (r.id === this.currentRound);
+        const card = document.createElement('div');
+        card.className = `round-select-card ${isActive ? 'active' : ''}`;
+        card.onclick = () => this.selectRound(r.id);
+
+        card.innerHTML = `
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+            <span class="badge ${r.id === 2 ? 'badge-accent' : 'badge-primary'}">${r.badge || `제${r.id}회`}</span>
+            ${isActive ? '<span style="color:var(--primary); font-weight:800; font-size:0.85rem;">✓ 선택됨</span>' : ''}
+          </div>
+          <div style="font-weight:800; font-size:1.02rem; color:var(--text-main); margin-bottom:2px;">${r.title}</div>
+          <div style="font-size:0.78rem; color:var(--text-muted);">${r.subtitle || '175문항 완비'}</div>
+        `;
+        container.appendChild(card);
+      });
+
+      // Add "Upcoming 3회" preview card
+      const upcomingCard = document.createElement('div');
+      upcomingCard.className = 'round-select-card upcoming';
+      upcomingCard.innerHTML = `
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+          <span class="badge badge-secondary">제3회 (업로드 예정)</span>
+        </div>
+        <div style="font-weight:800; font-size:1rem; color:var(--text-muted); margin-bottom:2px;">제3회 실전 모의고사</div>
+        <div style="font-size:0.78rem; color:var(--text-muted);">순차 업데이트 준비 중</div>
+      `;
+      container.appendChild(upcomingCard);
+    }
+
+    // Update Hero Title & Badges
+    const heroTitle = document.getElementById('homeHeroTitle');
+    if (heroTitle) {
+      heroTitle.textContent = `청소년상담사 1급 제${this.currentRound}회 실전 모의고사`;
+    }
+
+    const badgeRow = document.getElementById('homeHeroBadges');
+    if (badgeRow) {
+      if (this.currentRound === 2) {
+        badgeRow.innerHTML = `
+          <span class="badge badge-accent">제2회 모의고사 (NEW)</span>
+          <span class="badge badge-primary">2026 최신 개정 법령 &amp; DSM-5-TR</span>
+          <span class="badge badge-success">총 175문항 완비</span>
+        `;
+      } else {
+        badgeRow.innerHTML = `
+          <span class="badge badge-primary">제1회 모의고사</span>
+          <span class="badge badge-secondary">2017~2025 기출·출처분석 기반</span>
+          <span class="badge badge-success">총 175문항 완비</span>
+        `;
+      }
+    }
+
+    // Update Mode Card Titles
+    const s1CardTitle = document.getElementById('cardTitleSession1');
+    if (s1CardTitle) s1CardTitle.textContent = `[제${this.currentRound}회] 제1교시 실전 모의고사`;
+
+    const s2CardTitle = document.getElementById('cardTitleSession2');
+    if (s2CardTitle) s2CardTitle.textContent = `[제${this.currentRound}회] 제2교시 실전 모의고사`;
+
+    const allCardTitle = document.getElementById('cardTitleAll');
+    if (allCardTitle) allCardTitle.textContent = `[제${this.currentRound}회] 실전 풀세트 모의고사 (1+2교시)`;
+
+    const subjCardTitle = document.getElementById('cardTitleSubject');
+    if (subjCardTitle) subjCardTitle.textContent = `[제${this.currentRound}회] 과목별 집중 연습 모드`;
   },
 
   /**
@@ -37,6 +139,7 @@ const App = {
       const remember = rememberChk ? rememberChk.checked : true;
       StorageManager.setAuthenticated(remember);
 
+      this.renderRoundSelector();
       this.renderHomeStats();
       this.checkResumeSession();
       this.showView('home');
@@ -84,14 +187,12 @@ const App = {
    * 화면 뷰 전환
    */
   showView(viewName) {
-    // Force auth view if not authenticated
     if (!StorageManager.isAuthenticated() && viewName !== 'auth') {
       viewName = 'auth';
     }
 
     this.currentView = viewName;
 
-    // Toggle active section
     document.querySelectorAll('.view-section').forEach(sec => {
       sec.classList.remove('active');
     });
@@ -102,7 +203,6 @@ const App = {
       window.scrollTo({ top: 0, behavior: 'instant' });
     }
 
-    // Header visibility adjustments
     const header = document.getElementById('appHeader');
     const examHeader = document.getElementById('examHeaderBar');
     const bottomNav = document.getElementById('bottomNavBar');
@@ -125,13 +225,16 @@ const App = {
       if (bottomNav) bottomNav.style.display = 'none';
     }
 
-    // View specific hooks
     if (viewName === 'home') {
+      this.renderRoundSelector();
       this.renderHomeStats();
     } else if (viewName === 'wrong-notes') {
       WrongNotesManager.renderView();
     } else if (viewName === 'history') {
       this.renderHistoryView();
+    } else if (viewName === 'subject-select') {
+      const subjHeading = document.getElementById('subjectSelectHeading');
+      if (subjHeading) subjHeading.textContent = `📚 [제${this.currentRound}회] 과목별 집중 연습`;
     }
   },
 
@@ -183,13 +286,16 @@ const App = {
 
       card.innerHTML = `
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
-          <span style="font-weight:700; font-size:0.95rem;">${item.title}</span>
+          <div>
+            <span class="badge ${item.round === 2 ? 'badge-accent' : 'badge-primary'}" style="margin-right:6px;">제${item.round || 1}회</span>
+            <span style="font-weight:700; font-size:0.95rem;">${item.title}</span>
+          </div>
           <span class="badge ${item.isPassed ? 'badge-success' : 'badge-danger'}">
             ${item.isPassed ? '합격' : (item.hasDisqualification ? '과락' : '불합격')}
           </span>
         </div>
         <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.85rem; color:var(--text-muted);">
-          <span>${dateStr}</span>
+          <span>${dateStr} (총 ${item.totalQuestions}문항 중 ${item.correctCount}문항 정답)</span>
           <span style="font-weight:800; font-size:1.1rem; color:var(--primary);">${item.averageScore}점</span>
         </div>
       `;
@@ -221,7 +327,7 @@ const App = {
   },
 
   /**
-   * 폰트 크기 조절 (A- / A / A+)
+   * 폰트 크기 조절
    */
   initFontSize() {
     const saved = StorageManager.getFontSize();
@@ -271,7 +377,6 @@ const App = {
     window.addEventListener('keydown', (e) => {
       if (this.currentView !== 'exam') return;
 
-      // Number keys 1~5
       if (['1', '2', '3', '4', '5'].includes(e.key)) {
         ExamEngine.selectOption(parseInt(e.key));
       } else if (e.key === 'ArrowLeft') {
@@ -282,7 +387,7 @@ const App = {
         ExamEngine.toggleBookmark();
       } else if (e.key.toLowerCase() === 'o') {
         const overlay = document.getElementById('omrDrawerOverlay');
-        if (overlay.classList.contains('active')) {
+        if (overlay && overlay.classList.contains('active')) {
           ExamEngine.closeOMR();
         } else {
           ExamEngine.openOMR();

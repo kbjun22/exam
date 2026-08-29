@@ -1,11 +1,12 @@
 /**
- * 2026 청소년상담사 1급 CBT - 로컬 스토리지 데이터 매니저 (Offline Persistence)
+ * 2026 청소년상담사 1급 CBT - 로컬 스토리지 데이터 매니저 (Offline Persistence & Multi-Round)
  */
 const StorageManager = {
   KEYS: {
     AUTH: 'cbt_auth_state',
     THEME: 'cbt_theme',
     FONT_SIZE: 'cbt_font_size',
+    SELECTED_ROUND: 'cbt_selected_round',
     ACTIVE_SESSION: 'cbt_active_session',
     HISTORY: 'cbt_history',
     WRONG_NOTES: 'cbt_wrong_notes',
@@ -26,6 +27,19 @@ const StorageManager = {
   clearAuth() {
     localStorage.removeItem(this.KEYS.AUTH);
     sessionStorage.removeItem(this.KEYS.AUTH);
+  },
+
+  // Multi-Round Selection
+  getSelectedRound() {
+    try {
+      const saved = localStorage.getItem(this.KEYS.SELECTED_ROUND);
+      return saved ? parseInt(saved, 10) : 2; // Default to Round 2 (latest)
+    } catch (e) {
+      return 2;
+    }
+  },
+  setSelectedRound(roundId) {
+    localStorage.setItem(this.KEYS.SELECTED_ROUND, roundId.toString());
   },
 
   // Settings
@@ -79,15 +93,15 @@ const StorageManager = {
       date: new Date().toISOString(),
       ...item
     });
-    // Keep last 30 tests
-    const trimmed = history.slice(0, 30);
+    // Keep last 50 tests
+    const trimmed = history.slice(0, 50);
     localStorage.setItem(this.KEYS.HISTORY, JSON.stringify(trimmed));
   },
   clearHistory() {
     localStorage.removeItem(this.KEYS.HISTORY);
   },
 
-  // Wrong Answers Database
+  // Wrong Answers Database (Multi-Round Aware with uniqueId)
   getWrongNotes() {
     try {
       const data = localStorage.getItem(this.KEYS.WRONG_NOTES);
@@ -101,12 +115,19 @@ const StorageManager = {
     const now = new Date().toISOString();
     
     wrongList.forEach(item => {
-      const qId = item.id;
-      if (!db[qId]) {
-        db[qId] = {
-          id: qId,
+      const uniqueKey = item.uniqueId || `r${item.round || 1}_q${item.id}`;
+      if (!db[uniqueKey]) {
+        db[uniqueKey] = {
+          uniqueId: uniqueKey,
+          id: item.id,
+          round: item.round || 1,
           subject_id: item.subject_id,
           subject_name: item.subject_name,
+          stem: item.stem || '',
+          options: item.options || [],
+          explanation: item.explanation || '',
+          distractor_exp: item.distractor_exp || '',
+          citation: item.citation || '',
           wrongCount: 1,
           lastWrongDate: now,
           mastered: false,
@@ -115,32 +136,32 @@ const StorageManager = {
           correctAnswer: item.answer
         };
       } else {
-        db[qId].wrongCount += 1;
-        db[qId].lastWrongDate = now;
-        db[qId].mastered = false;
-        db[qId].lastSelectedAnswer = item.userAnswer;
+        db[uniqueKey].wrongCount += 1;
+        db[uniqueKey].lastWrongDate = now;
+        db[uniqueKey].mastered = false;
+        db[uniqueKey].lastSelectedAnswer = item.userAnswer;
       }
     });
 
     localStorage.setItem(this.KEYS.WRONG_NOTES, JSON.stringify(db));
   },
-  markWrongNoteMastered(qId, mastered = true) {
+  markWrongNoteMastered(uniqueKey, mastered = true) {
     const db = this.getWrongNotes();
-    if (db[qId]) {
-      db[qId].mastered = mastered;
+    if (db[uniqueKey]) {
+      db[uniqueKey].mastered = mastered;
       localStorage.setItem(this.KEYS.WRONG_NOTES, JSON.stringify(db));
     }
   },
-  saveUserNote(qId, note) {
+  saveUserNote(uniqueKey, note) {
     const db = this.getWrongNotes();
-    if (db[qId]) {
-      db[qId].userNote = note;
+    if (db[uniqueKey]) {
+      db[uniqueKey].userNote = note;
       localStorage.setItem(this.KEYS.WRONG_NOTES, JSON.stringify(db));
     }
   },
-  removeWrongNote(qId) {
+  removeWrongNote(uniqueKey) {
     const db = this.getWrongNotes();
-    delete db[qId];
+    delete db[uniqueKey];
     localStorage.setItem(this.KEYS.WRONG_NOTES, JSON.stringify(db));
   },
 
@@ -153,19 +174,19 @@ const StorageManager = {
       return [];
     }
   },
-  toggleBookmark(qId) {
+  toggleBookmark(uniqueKey) {
     let list = this.getBookmarks();
-    const idx = list.indexOf(qId);
+    const idx = list.indexOf(uniqueKey);
     if (idx >= 0) {
       list.splice(idx, 1);
     } else {
-      list.push(qId);
+      list.push(uniqueKey);
     }
     localStorage.setItem(this.KEYS.BOOKMARKS, JSON.stringify(list));
-    return list.includes(qId);
+    return list.includes(uniqueKey);
   },
-  isBookmarked(qId) {
+  isBookmarked(uniqueKey) {
     const list = this.getBookmarks();
-    return list.includes(qId);
+    return list.includes(uniqueKey);
   }
 };

@@ -91,13 +91,24 @@
          ==================================================================== -->
     <main class="view-section" id="view_home">
       <div class="home-hero">
-        <div class="home-badge-row">
-          <span class="badge badge-primary">2026년 제25회 대비</span>
-          <span class="badge badge-accent">최신 DSM-5-TR &amp; 법령 반영</span>
+        <div class="home-badge-row" id="homeHeroBadges">
+          <span class="badge badge-accent">제2회 모의고사 (NEW)</span>
+          <span class="badge badge-primary">2026 최신 개정 법령 &amp; DSM-5-TR</span>
           <span class="badge badge-success">총 175문항 완비</span>
         </div>
-        <h1 class="home-title">청소년상담사 1급 실전 모의고사</h1>
-        <p class="home-subtitle">모바일 환경에 최적화된 실전 CBT 시험 &amp; 오답노트 시스템</p>
+        <h1 class="home-title" id="homeHeroTitle">청소년상담사 1급 제2회 실전 모의고사</h1>
+        <p class="home-subtitle">모바일 &amp; 태블릿에 최적화된 실전 CBT 시험 &amp; 오답노트 시스템</p>
+      </div>
+
+      <!-- Round Selector Section (1회, 2회, 차후 3회...) -->
+      <div style="margin-bottom:20px;">
+        <div style="font-weight:700; font-size:0.95rem; margin-bottom:8px; display:flex; align-items:center; gap:6px; color:var(--text-main);">
+          <span>🎯</span>
+          <span>모의고사 회차 선택</span>
+        </div>
+        <div class="round-select-container" id="homeRoundSelector">
+          <!-- Dynamically populated by App.renderRoundSelector() -->
+        </div>
       </div>
 
       <!-- Quick Stats Card -->
@@ -119,13 +130,13 @@
       <!-- Main Exam Modes -->
       <div class="mode-grid">
         <!-- 1교시 실전 모의고사 -->
-        <div class="mode-card featured" onclick="ExamEngine.startExam({ mode: 'session1' })">
+        <div class="mode-card featured" onclick="ExamEngine.startExam({ mode: 'session1', round: App.currentRound })">
           <div class="mode-card-header">
             <div class="mode-icon-box">1️⃣</div>
             <span class="badge badge-primary">실전 75분 타이머</span>
           </div>
           <div class="mode-card-info">
-            <h3>제1교시 실전 모의고사</h3>
+            <h3 id="cardTitleSession1">[제2회] 제1교시 실전 모의고사</h3>
             <p>상담사 교육 및 사례지도, 청소년 관련 법과 행정, 상담연구방법론의 실제</p>
           </div>
           <div class="mode-meta">
@@ -136,13 +147,13 @@
         </div>
 
         <!-- 2교시 실전 모의고사 -->
-        <div class="mode-card featured" onclick="ExamEngine.startExam({ mode: 'session2' })">
+        <div class="mode-card featured" onclick="ExamEngine.startExam({ mode: 'session2', round: App.currentRound })">
           <div class="mode-card-header">
             <div class="mode-icon-box accent">2️⃣</div>
             <span class="badge badge-accent">실전 100분 타이머</span>
           </div>
           <div class="mode-card-info">
-            <h3>제2교시 실전 모의고사</h3>
+            <h3 id="cardTitleSession2">[제2회] 제2교시 실전 모의고사</h3>
             <p>비행상담, 성상담, 약물상담, 위기상담 (전공 4과목 통합)</p>
           </div>
           <div class="mode-meta">
@@ -153,13 +164,13 @@
         </div>
 
         <!-- 전체 풀세트 모의고사 -->
-        <div class="mode-card" onclick="ExamEngine.startExam({ mode: 'all' })">
+        <div class="mode-card" onclick="ExamEngine.startExam({ mode: 'all', round: App.currentRound })">
           <div class="mode-card-header">
             <div class="mode-icon-box success">👑</div>
             <span class="badge badge-success">전체 175문항</span>
           </div>
           <div class="mode-card-info">
-            <h3>실전 풀세트 모의고사 (1+2교시)</h3>
+            <h3 id="cardTitleAll">[제2회] 실전 풀세트 모의고사 (1+2교시)</h3>
             <p>1교시 75문항 + 2교시 100문항 전체 7개 과목 통합 실전 평가</p>
           </div>
           <div class="mode-meta">
@@ -176,7 +187,7 @@
             <span class="badge badge-warning">즉시 해설 가능</span>
           </div>
           <div class="mode-card-info">
-            <h3>과목별 집중 연습 모드</h3>
+            <h3 id="cardTitleSubject">[제2회] 과목별 집중 연습 모드</h3>
             <p>원하는 과목(25문항)만 골라서 풀고 즉시 정답 및 오답 반증 확인</p>
           </div>
           <div class="mode-meta">
@@ -207,7 +218,7 @@
          ==================================================================== -->
     <main class="view-section" id="view_subject-select">
       <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:16px;">
-        <h2>📚 과목별 집중 연습</h2>
+        <h2 id="subjectSelectHeading">📚 과목별 집중 연습</h2>
         <button class="btn btn-secondary btn-sm" onclick="App.showView('home')">← 홈으로</button>
       </div>
 
@@ -480,6 +491,7 @@
   <div class="toast-container" id="toastContainer"></div>
 
   <!-- Scripts -->
+  <script src="data/mock_exams.js"></script>
   <script src="data/questions.js"></script>
   <script src="js/storage.js"></script>
   <script src="js/score.js"></script>
@@ -492,6 +504,7 @@
     App.startSubjectExam = function(subjectId) {
       const isInstant = document.getElementById('chkInstantFeedback').checked;
       ExamEngine.startExam({
+        round: App.currentRound,
         mode: 'subject',
         subjectId: subjectId,
         isInstantFeedback: isInstant
@@ -507,3 +520,4 @@
   </script>
 </body>
 </html>
+
